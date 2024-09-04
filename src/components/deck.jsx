@@ -32,6 +32,11 @@ const DeckDetails = () => {
   }, [deckId]);
 
   if (!deck) {
+    if (!auth.currentUser) {
+      console.log("No current user or deckId");
+      navigate('/');
+      return;
+    }
     return <p>Loading...</p>;
   }
 
