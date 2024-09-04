@@ -1,7 +1,7 @@
-import { collection, query, getDocs, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { db, auth } from '../config/firebase';
+import { collection, query, getDocs, where } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { db, auth } from '../config/firebase';
 import NewDeck from './newDeck';
 
 const DeckCollections = () => {
@@ -10,7 +10,10 @@ const DeckCollections = () => {
   const navigate = useNavigate();
 
   const fetchDecks = async () => {
-    if (!auth.currentUser) navigate('/');
+    if (!auth.currentUser) {
+      navigate('/'); // Redirect to the login page if not logged in
+      return;
+    }
 
     const decksRef = collection(db, 'decks');
     const q = query(decksRef, where('createdBy', '==', auth.currentUser.email));
