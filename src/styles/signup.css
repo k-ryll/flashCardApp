@@ -3,6 +3,7 @@
   justify-content: center; 
   align-items: center;
   height: 100vh;
+  padding: 1rem; /* Add padding for small screens */
 }
 
 .signupForm {
@@ -13,45 +14,82 @@
   border-radius: 8px;
   border: 1px solid #ddd;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%; /* Make the form take up the full width on small screens */
+  max-width: 400px; /* Limit the max width on larger screens */
 }
 
-.signupForm input{
+.signupForm input {
   border-radius: 8px;
   margin-bottom: 1rem;
-  font-size: 2rem;
-  padding: .5rem;
+  font-size: 1.5rem;
+  padding: 0.5rem;
 }
 
-.signupForm button{
+.signupForm button {
   font-size: 1.5rem;
   vertical-align: middle;
   background-color: transparent;
-  border: solid .1 rgba(0, 0, 0, 0.356);
-  padding-block: .5rem;
+  border: solid 0.1rem rgba(0, 0, 0, 0.356);
+  padding-block: 0.5rem;
 }
 
-.signupForm p{
-  padding-top: .5rem;
+.signupForm p {
+  padding-top: 0.5rem;
 }
+
 .signupForm p:hover {
   color: rgb(31, 78, 119);
   text-decoration: underline;
   cursor: pointer;
 }
 
-.signupForm button:hover{
+.signupForm button:hover {
   background-color: rgb(31, 78, 119);
   color: white;
   cursor: pointer;
 }
 
-.googleSignin{
+.googleSignin {
   display: flex;
   justify-content: space-evenly;
-  margin-top: .5rem;
+  margin-top: 0.5rem;
 }
-.googleLogo{
+
+.googleLogo {
   max-width: 1.5rem;
   vertical-align: middle;
 }
 
+@media (max-width: 768px) {
+  .signupForm {
+    padding: 2rem; /* Reduce padding on smaller screens */
+    max-width: 90%; /* Make the form take up most of the screen */
+  }
+
+  .signupForm input,
+  .signupForm button {
+    font-size: 1.2rem; 
+    padding: 0.4rem;
+  }
+
+  .googleSignin {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .googleLogo {
+    max-width: 1.5rem; 
+  }
+}
+
+@media (max-width: 480px) {
+  .signupForm {
+    padding: 1.5rem; /* Further reduce padding on extra small screens */
+  }
+
+  .signupForm input,
+  .signupForm button {
+    font-size: 1rem; /* Further reduce font size */
+    padding: 0.3rem;
+  }
+}

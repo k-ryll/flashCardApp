@@ -16,7 +16,7 @@ const Cards = ({ deckId }) => {
     }
 
     try {
-      const deckRef = doc(db, 'decks', deckId);  // Use deckId as the document ID
+      const deckRef = doc(db, 'decks', deckId); 
       const deckDoc = await getDoc(deckRef);
 
       if (deckDoc.exists()) {
