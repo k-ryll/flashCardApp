@@ -28,6 +28,11 @@ const DeckCollections = () => {
   }, []);
 
   const handleDeckClick = (deckId) => {
+    if (!auth.currentUser) {
+      console.log("No current user or deckId");
+      navigate('/');
+      return;
+    }
     navigate(`/decks/${deckId}`);
   };
 
