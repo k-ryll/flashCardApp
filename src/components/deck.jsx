@@ -15,6 +15,12 @@ const DeckDetails = () => {
       const deckRef = doc(db, 'decks', deckId);
       const deckSnap = await getDoc(deckRef);
 
+      if (!auth.currentUser) {
+        console.log("No current user or deckId");
+        navigate('/');
+        return;
+      }
+
       if (deckSnap.exists()) {
         setDeck(deckSnap.data());
       } else {

@@ -3,15 +3,19 @@ import { db, auth } from '../config/firebase';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import EditCards from './editCards';
 import StudyCard from './studyCard';
+import { useNavigate } from 'react-router-dom';
 
 const Cards = ({ deckId }) => {
   const [cards, setCards] = useState([]);
   const [showStudyPage, setShowStudyPage] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const navigate = useNavigate();
+
 
   const fetchDeckOwner = useCallback(async () => {
     if (!auth.currentUser || !deckId) {
       console.log("No current user or deckId");
+      navigate('/');
       return;
     }
 

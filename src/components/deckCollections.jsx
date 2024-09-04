@@ -10,7 +10,7 @@ const DeckCollections = () => {
   const navigate = useNavigate();
 
   const fetchDecks = async () => {
-    if (!auth.currentUser) return;
+    if (!auth.currentUser) navigate('/');
 
     const decksRef = collection(db, 'decks');
     const q = query(decksRef, where('createdBy', '==', auth.currentUser.email));
