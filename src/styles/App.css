@@ -54,8 +54,12 @@ table {
 
   --pad-100: 1rem;
 }
+html, body{
+  height: 100%;
+}
 
-body{background: linear-gradient(270deg, #FFD6E0, #FFC2D1 30%, #E0709F 60%, #dd578f);
+body{
+  background: linear-gradient(270deg, #FFD6E0, #FFC2D1 30%, #E0709F 60%, #dd578f);
 
 }
 

@@ -11,7 +11,7 @@ const DeckCollections = () => {
 
   const fetchDecks = async () => {
     if (!auth.currentUser) {
-      navigate('/'); // Redirect to the login page if not logged in
+      navigate('/'); 
       return;
     }
 

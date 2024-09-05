@@ -13,7 +13,7 @@ const DeckDetails = () => {
     const fetchDeck = async () => {
       if (!auth.currentUser) {
         console.log("No current user or deckId");
-        navigate('/'); // Redirect to the login page if not logged in
+        navigate('/'); 
         return;
       }
 

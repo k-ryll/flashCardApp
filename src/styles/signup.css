@@ -3,7 +3,8 @@
   justify-content: center; 
   align-items: center;
   height: 100vh;
-  padding: 1rem; /* Add padding for small screens */
+  padding: 1rem; 
+  
 }
 
 .signupForm {
@@ -14,8 +15,8 @@
   border-radius: 8px;
   border: 1px solid #ddd;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 100%; /* Make the form take up the full width on small screens */
-  max-width: 400px; /* Limit the max width on larger screens */
+  width: 100%; 
+  max-width: 25rem; 
 }
 
 .signupForm input {

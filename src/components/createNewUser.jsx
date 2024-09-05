@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import '../styles/signup.css'
 
 const CreateUserForm = ({ setIsCreatingAccount, setIsSignedIn }) => {
   const [email, setEmail] = useState('');
@@ -51,7 +52,7 @@ const CreateUserForm = ({ setIsCreatingAccount, setIsSignedIn }) => {
   };
 
   return (
-    <form onSubmit={createAccount}>
+    <form onSubmit={createAccount} className='signupForm'>
       <input
         type="text"
         placeholder='Username...'
