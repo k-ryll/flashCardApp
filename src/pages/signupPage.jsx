@@ -75,6 +75,7 @@ const SignupPage = ({ setIsSignedIn }) => {
 
   return (
     <div className='signupContainer'>
+    
       {isCreatingAccount ? (
         <CreateUserForm setIsCreatingAccount={setIsCreatingAccount} setIsSignedIn={setIsSignedIn} />
       ) : (

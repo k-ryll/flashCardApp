@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import DeckCollections from '../components/deckCollections';
+import '../styles/homepage.css'
 
 const Homepage = ({ setIsSignedIn }) => {
   
@@ -33,8 +34,11 @@ const Homepage = ({ setIsSignedIn }) => {
 
   return (
     <div className='homepage'>
+      <header className='header'>
       <h1>Welcome, {user.displayName}</h1>
       <button className='signoutBtn' onClick={handleSignOut}>Signout</button>
+      </header>
+      
       
       <DeckCollections />
      

@@ -1,22 +1,24 @@
 .signupContainer {
-  display: flex;
-  justify-content: center; 
-  align-items: center;
+  width: 100%;
   height: 100vh;
-  padding: 1rem; 
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background-image: url(background.svg);
+  overflow: hidden;
 }
 
+
 .signupForm {
+  z-index: 1;
   background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  text-align: left;
   display: flex;
   flex-direction: column;
   padding: 3rem;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 100%; 
-  max-width: 25rem; 
 }
 
 .signupForm input {
@@ -32,6 +34,7 @@
   background-color: transparent;
   border: solid 0.1rem rgba(0, 0, 0, 0.356);
   padding-block: 0.5rem;
+  border-radius: 20px;
 }
 
 .signupForm p {
@@ -45,7 +48,7 @@
 }
 
 .signupForm button:hover {
-  background-color: rgb(31, 78, 119);
+  background-color: rgb(141, 184, 222);
   color: white;
   cursor: pointer;
 }
@@ -61,10 +64,15 @@
   vertical-align: middle;
 }
 
+
+
 @media (max-width: 768px) {
+
+
+
   .signupForm {
-    padding: 2rem; /* Reduce padding on smaller screens */
-    max-width: 90%; /* Make the form take up most of the screen */
+    padding: 2rem; 
+    max-width: 90%;
   }
 
   .signupForm input,
@@ -84,13 +92,15 @@
 }
 
 @media (max-width: 480px) {
+ 
+
   .signupForm {
-    padding: 1.5rem; /* Further reduce padding on extra small screens */
+    padding: 1.5rem; 
   }
 
   .signupForm input,
   .signupForm button {
-    font-size: 1rem; /* Further reduce font size */
+    font-size: 1rem;
     padding: 0.3rem;
   }
 }
