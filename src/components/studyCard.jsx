@@ -1,144 +1,94 @@
 import React, { useState, useEffect } from 'react';
+import { writeBatch, doc } from 'firebase/firestore';
+import { db } from '../config/firebase'; // Make sure to adjust the Firebase import
 
 const StudyCard = ({ setShowStudyPage, cards }) => {
   const [showAnswer, setShowAnswer] = useState(false);
-  const [correctScore, setCorrectScore] = useState(0);
-  const [incorrectScore, setIncorrectScore] = useState(0);
+  const [confidenceLevels, setConfidenceLevels] = useState({});
   const [questionNumber, setQuestionNumber] = useState(0);
-  const [isLooping, setIsLooping] = useState(false); // State for looping
-  const [isRandom, setIsRandom] = useState(false); // State for random cards
-  const [unseenQuestions, setUnseenQuestions] = useState(new Set()); // Track unseen questions
+  const [batchCounter, setBatchCounter] = useState(0);
 
-  useEffect(() => {
-    if (isRandom) {
-      setUnseenQuestions(new Set(Array.from({ length: cards.length }, (_, i) => i)));
-    } else {
-      setUnseenQuestions(new Set());
+  // Function to handle confidence level selection
+  const handleConfidenceSelect = (level) => {
+    const currentCard = cards[questionNumber];
+
+    // Update confidence levels for the current card
+    setConfidenceLevels((prev) => ({
+      ...prev,
+      [currentCard.id]: level,
+    }));
+
+    // Increase the batch counter, and check if it's time to save to Firestore
+    setBatchCounter(batchCounter + 1);
+
+    if (batchCounter >= 9) {
+      saveBatchToFirestore(); // Save every 10 rounds
+      setBatchCounter(0);
     }
-  }, [isRandom, cards.length]);
 
-  const handleClose = () => {
-    setShowStudyPage(false);
-  };
-
-  const handleRevealAnswer = () => {
-    setShowAnswer(true);
-  };
-
-  const handleCorrect = () => {
-    setCorrectScore(correctScore + 1);
+    // Move to the next question
     handleNextQuestion();
   };
 
-  const handleIncorrect = () => {
-    setIncorrectScore(incorrectScore + 1);
-    handleNextQuestion();
-  };
+  // Function to batch save confidence levels to Firestore
+  const saveBatchToFirestore = async () => {
+    const batch = writeBatch(db);
 
- const handleNextQuestion = () => {
-  setShowAnswer(false);
-
-  if (isRandom) {
-    const remainingQuestions = Array.from(unseenQuestions);
-
-    if (remainingQuestions.length === 0) {
-      if (isLooping) {
-        // Reset unseen questions only when looping
-        const allQuestionIndexes = new Set(Array.from({ length: cards.length }, (_, i) => i));
-        setUnseenQuestions(allQuestionIndexes);
-        handleNextQuestion(); // Call again to select the first question
-        return;
-      } else {
-        alert('You have completed all the questions!');
-        setShowStudyPage(false);
-        return;
-      }
-    }
-
-    const randomIndex = Math.floor(Math.random() * remainingQuestions.length);
-    const nextQuestionIndex = remainingQuestions[randomIndex];
-    setQuestionNumber(nextQuestionIndex);
-    setUnseenQuestions(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(nextQuestionIndex);
-      return newSet;
+    Object.keys(confidenceLevels).forEach((cardId) => {
+      const cardRef = doc(db, 'cards', cardId);
+      batch.set(cardRef, { confidenceLevel: confidenceLevels[cardId] }, { merge: true });
     });
 
-  } else {
+    await batch.commit();
+    setConfidenceLevels({}); // Clear the stored levels after saving
+  };
+
+  // Function to move to the next question
+  const handleNextQuestion = () => {
+    setShowAnswer(false); // Hide answer for the next card
     if (questionNumber < cards.length - 1) {
       setQuestionNumber(questionNumber + 1);
-    } else if (isLooping) {
-      setQuestionNumber(0);
     } else {
       alert('You have completed all the questions!');
       setShowStudyPage(false);
     }
-  }
-};
-
-  
-
-  const toggleLooping = () => {
-    setIsLooping(!isLooping); // Toggle the looping state
   };
 
-  const toggleRandom = () => {
-    setIsRandom(!isRandom); // Toggle the random state
-  };
+  // Ensure any remaining data is saved when the component unmounts
+  useEffect(() => {
+    return () => {
+      if (batchCounter > 0) saveBatchToFirestore();
+    };
+  }, [batchCounter]);
 
-  if (!cards || cards.length === 0) {
-    return <p>No cards available</p>;
-  }
-
-  // Ensure questionNumber is within valid range
-  const validQuestionNumber = Math.min(Math.max(questionNumber, 0), cards.length - 1);
-  const currentCard = cards[validQuestionNumber] || {};
+  // Get the current card based on question number
+  const currentCard = cards[questionNumber] || {};
 
   return (
     <div>
-      <button onClick={handleClose}>X</button>
+      <button onClick={() => setShowStudyPage(false)}>Close</button>
+
       <div>
         {showAnswer ? (
           <>
             <h1>{currentCard.answer || 'No answer available'}</h1>
-            {currentCard.answerImage && (
-              <img src={currentCard.answerImage} alt="Answer" />
-            )}
+            {currentCard.answerImage && <img src={currentCard.answerImage} alt="Answer" />}
+            <div>
+              <p>Select your confidence level:</p>
+              <button onClick={() => handleConfidenceSelect(1)}>1 (Low)</button>
+              <button onClick={() => handleConfidenceSelect(2)}>2</button>
+              <button onClick={() => handleConfidenceSelect(3)}>3</button>
+              <button onClick={() => handleConfidenceSelect(4)}>4</button>
+              <button onClick={() => handleConfidenceSelect(5)}>5 (High)</button>
+            </div>
           </>
         ) : (
-          <>
+          <div className='question'>
             <h1>{currentCard.question || 'No question available'}</h1>
-            {currentCard.questionImage && (
-              <img src={currentCard.questionImage} alt="Question" />
-            )}
-          </>
-        )}
-      </div>
-      <div>
-        {showAnswer ? (
-          <div>
-            <button onClick={handleCorrect}>Correct</button>
-            <button onClick={handleIncorrect}>Incorrect</button>
+            {currentCard.questionImage && <img src={currentCard.questionImage} alt="Question" />}
+            <button onClick={() => setShowAnswer(true)}>Reveal Answer</button>
           </div>
-        ) : (
-          <button onClick={handleRevealAnswer}>Reveal answer</button>
         )}
-      </div>
-      <div>
-        <p>Correct: {correctScore}</p>
-        <p>Incorrect: {incorrectScore}</p>
-      </div>
-      <div>
-        <label>
-          <input type="checkbox" checked={isLooping} onChange={toggleLooping} />
-          Loop questions
-        </label>
-      </div>
-      <div>
-        <label>
-          <input type="checkbox" checked={isRandom} onChange={toggleRandom} />
-          Random order
-        </label>
       </div>
     </div>
   );

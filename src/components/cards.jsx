@@ -82,11 +82,16 @@ const Cards = ({ deckId }) => {
           {isOwner && <EditCards deckId={deckId} refetchCards={fetchCards} />}
           {cards.length > 0 ? (
             cards.map((card) => (
-              <div key={card.id}>
+              <div key={card.id} className='cardPreview'>
+                <div className='questionPreview'>
                 <h2>{card.question}</h2>
                 <img src={card.questionImage} alt="" />
+                </div>
+                <div className='answerPreview'>
                 <h2>{card.answer}</h2>
                 <img src={card.answerImage} alt="" />
+                </div>
+                
               </div>
             ))
           ) : (

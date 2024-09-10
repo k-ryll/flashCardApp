@@ -41,6 +41,7 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
+textarea{resize: none;}
 
 :root {
   --clr-background:#F4E7FB;
@@ -62,3 +63,48 @@ body{
   background-color: #cde1ee;
 }
 
+.deckOverview{
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.cardPreview{
+	display: flex;
+	padding-inline: 2rem;
+	gap: 1rem;
+	margin-bottom: .5rem;
+}
+.cardPreview div{
+	border: 1px black solid;
+	width: 50%;
+	padding: 1rem;
+	
+	background-color: white;
+}
+
+.cardContainer{
+	display: flex;
+	flex-direction: column;
+}
+
+.addcardContainer{
+	padding-inline: 2rem;
+	justify-content: center;
+	align-items: center;
+	padding-block: 1rem;
+}
+
+.startBtn {
+	font-size: 1.5rem;
+	background-color: white;
+	padding: 1rem;
+	border-radius: 10px;
+	align-self: center;
+}
+
+.startBtn:hover{
+	background-color: transparent;
+}
+
+.question{
+	border: 1px solid black;
+}

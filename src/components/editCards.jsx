@@ -102,10 +102,9 @@ const EditCards = ({ deckId, refetchCards }) => {
   };
 
   return (
-    <div>
+    <div className='addcardContainer'>
       <form onSubmit={submitDeck}>
-        <input
-          type="text"
+        <textarea
           className="questionInput"
           placeholder="Enter your question"
           value={questionInput}
@@ -118,8 +117,7 @@ const EditCards = ({ deckId, refetchCards }) => {
           className="questionImg"
           disabled={loading}
         />
-        <input
-          type="text"
+        <textarea
           className="answerInput"
           placeholder="Enter your answer"
           value={answerInput}

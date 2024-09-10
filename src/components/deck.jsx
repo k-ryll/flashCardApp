@@ -39,7 +39,7 @@ const DeckDetails = () => {
   };
 
   return (
-    <div>
+    <div className='deckOverview'>
       <h1>{deck.name}</h1>
       <p>Owner: {deck.createdBy}</p>
       <p>{deck.description}</p>
