@@ -14,6 +14,8 @@
   width: 50%;
   padding: 1rem;
   background-color: white;
+  white-space: pre-wrap; /* Preserve newlines and spaces */
+  word-wrap: break-word; /* Ensure long words are wrapped */
 }
 
 .cardContainer {
@@ -82,8 +84,10 @@
   border-radius: 8px;
   background-color: white;
   gap: 1rem;
-  min: minmax(30rem, 10rem);
+  font-size: 1.5rem;
   max-width: 50rem;
+  white-space: pre-wrap; /* Preserve newlines and spaces */
+  word-wrap: break-word; /* Ensure long words are wrapped */
 }
 
 .answer h1 {
