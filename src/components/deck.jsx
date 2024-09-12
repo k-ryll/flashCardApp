@@ -62,11 +62,15 @@ const DeckDetails = () => {
 
   return (
     <div className='deckOverview'>
+      <div className='deck-info'>
       <h1>{deck.name}</h1>
       <p>Owner: {deck.createdBy}</p>
       <p>{deck.description}</p>
+      </div>
+      <div className='deck-buttons'>
       <button onClick={goToHomepage}>Go Back to Homepage</button>
       <button onClick={deleteDeckAndCards}>Delete Deck</button>
+      </div>
       
       <Cards deckId={deckId} />
     </div>

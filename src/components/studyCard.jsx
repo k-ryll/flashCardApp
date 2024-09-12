@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { writeBatch, doc } from 'firebase/firestore';
-import { db } from '../config/firebase'; // Make sure to adjust the Firebase import
+import { db } from '../config/firebase';
 
 const StudyCard = ({ setShowStudyPage, cards }) => {
   const [showAnswer, setShowAnswer] = useState(false);
@@ -9,6 +9,7 @@ const StudyCard = ({ setShowStudyPage, cards }) => {
   const [batchCounter, setBatchCounter] = useState(0);
   const [isLooping, setIsLooping] = useState(true); // Default to looping
   const [sortedCards, setSortedCards] = useState([]);
+  const [loading, setLoading] = useState(false); // Add a loading state
 
   // Shuffle function
   const shuffleArray = (array) => {
@@ -73,15 +74,20 @@ const StudyCard = ({ setShowStudyPage, cards }) => {
 
   // Function to move to the next question
   const handleNextQuestion = () => {
-    setShowAnswer(false); // Hide answer for the next card
-    if (questionNumber < sortedCards.length - 1) {
-      setQuestionNumber(questionNumber + 1);
-    } else if (isLooping) {
-      setQuestionNumber(0); // Loop back to the start
-    } else {
-      alert('You have completed all the questions!');
-      setShowStudyPage(false);
-    }
+    setLoading(true); // Start loading
+
+    setTimeout(() => {
+      setShowAnswer(false); // Hide answer for the next card
+      if (questionNumber < sortedCards.length - 1) {
+        setQuestionNumber(questionNumber + 1);
+      } else if (isLooping) {
+        setQuestionNumber(0); // Loop back to the start
+      } else {
+        alert('You have completed all the questions!');
+        setShowStudyPage(false);
+      }
+      setLoading(false); // End loading
+    }, 500); // Adjust the delay for smooth transition
   };
 
   // Function to toggle looping
@@ -106,27 +112,31 @@ const StudyCard = ({ setShowStudyPage, cards }) => {
         {isLooping ? 'Disable Looping' : 'Enable Looping'}
       </button>
 
-      <div className='study-panel'>
-        {showAnswer ? (
-          <div className='answer'>
-            <h1>{currentCard.answer || 'No answer available'}</h1>
-            {currentCard.answerImage && <img src={currentCard.answerImage} alt="Answer" />}
-            <div>
-              <button onClick={() => handleConfidenceSelect(1)}>1 (Low)</button>
-              <button onClick={() => handleConfidenceSelect(2)}>2</button>
-              <button onClick={() => handleConfidenceSelect(3)}>3</button>
-              <button onClick={() => handleConfidenceSelect(4)}>4</button>
-              <button onClick={() => handleConfidenceSelect(5)}>5 (High)</button>
+      {loading ? (
+        <div className="loading-center">Loading next question...</div> // Apply the loading-center class
+      ) : (
+        <div className='study-panel'>
+          {showAnswer ? (
+            <div className='answer'>
+              <h1>{currentCard.answer || 'No answer available'}</h1>
+              {currentCard.answerImage && <img src={currentCard.answerImage} alt="Answer" />}
+              <div>
+                <button onClick={() => handleConfidenceSelect(1)}>1 (Low)</button>
+                <button onClick={() => handleConfidenceSelect(2)}>2</button>
+                <button onClick={() => handleConfidenceSelect(3)}>3</button>
+                <button onClick={() => handleConfidenceSelect(4)}>4</button>
+                <button onClick={() => handleConfidenceSelect(5)}>5 (High)</button>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className='question'>
-            <h1>{currentCard.question || 'No question available'}</h1>
-            {currentCard.questionImage && <img src={currentCard.questionImage} alt="Question" />}
-            <button onClick={() => setShowAnswer(true)}>Reveal Answer</button>
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className='question'>
+              <h1>{currentCard.question || 'No question available'}</h1>
+              {currentCard.questionImage && <img src={currentCard.questionImage} alt="Question" />}
+              <button onClick={() => setShowAnswer(true)}>Reveal Answer</button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

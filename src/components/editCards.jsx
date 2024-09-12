@@ -56,7 +56,7 @@ const EditCards = ({ deckId, refetchCards }) => {
         answer: answerInput,
         answerImage: answerImgUrl,
         deck: deckId,
-        confidenceLevel:1,
+        confidenceLevel:0,
         createdBy: auth.currentUser.email,
         createdAt: serverTimestamp(),
       });
