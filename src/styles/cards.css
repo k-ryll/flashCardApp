@@ -1,0 +1,150 @@
+.deckOverview {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.cardPreview {
+  display: flex;
+  padding-inline: 2rem;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.cardPreview div {
+  border: 1px black solid;
+  width: 50%;
+  padding: 1rem;
+  background-color: white;
+}
+
+.cardContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.addcardContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  padding-inline: 2rem;
+  padding-block: 1rem;
+  flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+}
+
+.newDeckForm div textarea {
+  font-size: 1.5rem;
+}
+
+.newDeckForm {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  flex: 1;
+  padding: 1rem;
+  flex-wrap: wrap; /* Allow the form to wrap on smaller screens */
+}
+
+.newDeckForm div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.startBtn {
+  font-size: 1.5rem;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 10px;
+  align-self: center;
+}
+
+.startBtn:hover {
+  background-color: pink;
+  color: white;
+  cursor: pointer;
+}
+
+.study-panel {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin: 1rem;
+}
+
+.answer,
+.question {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  padding: 2rem;
+  border: 1px dimgray solid;
+  border-radius: 8px;
+  background-color: white;
+  gap: 1rem;
+  min: minmax(30rem, 10rem);
+  max-width: 50rem;
+}
+
+.answer h1 {
+  margin-bottom: 1rem;
+  color: rgb(198, 49, 49);
+}
+
+.question img,
+.answer img {
+  max-width: 100%;
+  width: 30rem;
+}
+
+.question img {
+  display: inline-block;
+}
+
+.question button {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1rem;
+  align-self: center;
+}
+
+.question button:hover {
+  background-color: pink;
+  color: white;
+}
+
+/* Media Queries for responsiveness */
+@media (max-width: 768px) {
+  .cardPreview div {
+    width: 100%; /* Make cards full-width on smaller screens */
+  }
+
+  .addcardContainer,
+  .newDeckForm {
+    flex-direction: column; /* Stack elements vertically on smaller screens */
+    padding-inline: 1rem;
+  }
+
+  .study-panel {
+    padding: 1rem;
+    margin: 1rem;
+  }
+
+  .question img,
+  .answer img {
+    width: 100%; /* Make images responsive on smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .startBtn {
+    font-size: 1.2rem;
+    padding: 0.75rem; /* Smaller button for small screens */
+  }
+
+  .answer,
+  .question {
+    padding: 1rem;
+    font-size: 1rem; /* Reduce padding and font size */
+  }
+}

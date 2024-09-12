@@ -4,13 +4,13 @@ import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firesto
 import EditCards from './editCards';
 import StudyCard from './studyCard';
 import { useNavigate } from 'react-router-dom';
+import '../styles/cards.css';
 
 const Cards = ({ deckId }) => {
   const [cards, setCards] = useState([]);
   const [showStudyPage, setShowStudyPage] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const navigate = useNavigate();
-
 
   const fetchDeckOwner = useCallback(async () => {
     if (!auth.currentUser || !deckId) {
@@ -25,14 +25,8 @@ const Cards = ({ deckId }) => {
 
       if (deckDoc.exists()) {
         const deckData = deckDoc.data();
-        console.log("Deck Data:", deckData);
-        console.log("Current User Email:", auth.currentUser.email);
-
         if (deckData.createdBy === auth.currentUser.email) {
           setIsOwner(true);
-          console.log("User is the owner of the deck");
-        } else {
-          console.log("User is NOT the owner of the deck");
         }
       } else {
         console.log("Deck document does not exist");
@@ -40,7 +34,7 @@ const Cards = ({ deckId }) => {
     } catch (error) {
       console.error('Error fetching the deck owner:', error);
     }
-  }, [deckId]);
+  }, [deckId, navigate]);
 
   const fetchCards = useCallback(async () => {
     if (!auth.currentUser || !deckId) return;
@@ -48,16 +42,21 @@ const Cards = ({ deckId }) => {
     const cardsRef = collection(db, 'cards');
     const q = query(
       cardsRef,
-      where('deck', '==', deckId)  // Assuming 'deck' field in 'cards' refers to the deck ID
+      where('deck', '==', deckId)
     );
 
     try {
       const querySnapshot = await getDocs(q);
-      const cardsArray = querySnapshot.docs.map((doc) => ({
+      const uniqueCards = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
       }));
-      setCards(cardsArray);
+
+      // Filter out duplicate cards by id
+      const filteredCards = uniqueCards.filter((card, index, self) =>
+        index === self.findIndex((t) => t.id === card.id)
+      );
+      setCards(filteredCards);
     } catch (error) {
       console.error('Error fetching the cards:', error);
     }
@@ -75,28 +74,30 @@ const Cards = ({ deckId }) => {
   return (
     <div className="cardContainer">
       {showStudyPage ? (
-        <StudyCard cards={cards} setShowStudyPage={setShowStudyPage}/>
+        <StudyCard cards={cards} setShowStudyPage={setShowStudyPage} />
       ) : (
         <>
           <button className='startBtn' onClick={handleStartClick}>Start Studying</button>
           {isOwner && <EditCards deckId={deckId} refetchCards={fetchCards} />}
+          <div className='cardPrviewContainer'>
           {cards.length > 0 ? (
             cards.map((card) => (
               <div key={card.id} className='cardPreview'>
                 <div className='questionPreview'>
-                <h2>{card.question}</h2>
-                <img src={card.questionImage} alt="" />
+                  <h2>{card.question}</h2>
+                 {card.questionImage && <img src={card.questionImage} alt="Question" />} 
                 </div>
                 <div className='answerPreview'>
-                <h2>{card.answer}</h2>
-                <img src={card.answerImage} alt="" />
+                  <h2>{card.answer}</h2>
+                  {card.answerImage && <img src={card.answerImage} alt="Answer" />}
                 </div>
-                
               </div>
             ))
           ) : (
             <p>No cards in this deck</p>
           )}
+          </div>
+          
         </>
       )}
     </div>

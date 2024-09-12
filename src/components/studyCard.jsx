@@ -7,10 +7,37 @@ const StudyCard = ({ setShowStudyPage, cards }) => {
   const [confidenceLevels, setConfidenceLevels] = useState({});
   const [questionNumber, setQuestionNumber] = useState(0);
   const [batchCounter, setBatchCounter] = useState(0);
+  const [isLooping, setIsLooping] = useState(true); // Default to looping
+  const [sortedCards, setSortedCards] = useState([]);
+
+  // Shuffle function
+  const shuffleArray = (array) => {
+    let shuffledArray = array.slice(); // Copy the array
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+    }
+    return shuffledArray;
+  };
+
+  // Function to sort cards by confidence level
+  const sortByConfidence = (array) => {
+    return array.slice().sort((a, b) => {
+      const aConfidence = confidenceLevels[a.id] || 0; // Default to 0 if no confidence level set
+      const bConfidence = confidenceLevels[b.id] || 0;
+      return aConfidence - bConfidence;
+    });
+  };
+
+  useEffect(() => {
+    // Shuffle the cards and then sort them by confidence level
+    const shuffledCards = shuffleArray(cards);
+    setSortedCards(sortByConfidence(shuffledCards));
+  }, [cards, confidenceLevels]); // Re-shuffle and sort if confidenceLevels change
 
   // Function to handle confidence level selection
   const handleConfidenceSelect = (level) => {
-    const currentCard = cards[questionNumber];
+    const currentCard = sortedCards[questionNumber];
 
     // Update confidence levels for the current card
     setConfidenceLevels((prev) => ({
@@ -18,7 +45,7 @@ const StudyCard = ({ setShowStudyPage, cards }) => {
       [currentCard.id]: level,
     }));
 
-    // Increase the batch counter, and check if it's time to save to Firestore
+    // Increase the batch counter and check if it's time to save to Firestore
     setBatchCounter(batchCounter + 1);
 
     if (batchCounter >= 9) {
@@ -40,18 +67,26 @@ const StudyCard = ({ setShowStudyPage, cards }) => {
     });
 
     await batch.commit();
+    console.log("levels set");
     setConfidenceLevels({}); // Clear the stored levels after saving
   };
 
   // Function to move to the next question
   const handleNextQuestion = () => {
     setShowAnswer(false); // Hide answer for the next card
-    if (questionNumber < cards.length - 1) {
+    if (questionNumber < sortedCards.length - 1) {
       setQuestionNumber(questionNumber + 1);
+    } else if (isLooping) {
+      setQuestionNumber(0); // Loop back to the start
     } else {
       alert('You have completed all the questions!');
       setShowStudyPage(false);
     }
+  };
+
+  // Function to toggle looping
+  const toggleLooping = () => {
+    setIsLooping(!isLooping);
   };
 
   // Ensure any remaining data is saved when the component unmounts
@@ -62,26 +97,28 @@ const StudyCard = ({ setShowStudyPage, cards }) => {
   }, [batchCounter]);
 
   // Get the current card based on question number
-  const currentCard = cards[questionNumber] || {};
+  const currentCard = sortedCards[questionNumber] || {};
 
   return (
     <div>
       <button onClick={() => setShowStudyPage(false)}>Close</button>
+      <button onClick={toggleLooping}>
+        {isLooping ? 'Disable Looping' : 'Enable Looping'}
+      </button>
 
-      <div>
+      <div className='study-panel'>
         {showAnswer ? (
-          <>
+          <div className='answer'>
             <h1>{currentCard.answer || 'No answer available'}</h1>
             {currentCard.answerImage && <img src={currentCard.answerImage} alt="Answer" />}
             <div>
-              <p>Select your confidence level:</p>
               <button onClick={() => handleConfidenceSelect(1)}>1 (Low)</button>
               <button onClick={() => handleConfidenceSelect(2)}>2</button>
               <button onClick={() => handleConfidenceSelect(3)}>3</button>
               <button onClick={() => handleConfidenceSelect(4)}>4</button>
               <button onClick={() => handleConfidenceSelect(5)}>5 (High)</button>
             </div>
-          </>
+          </div>
         ) : (
           <div className='question'>
             <h1>{currentCard.question || 'No question available'}</h1>

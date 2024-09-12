@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 import Cards from './cards';
 
@@ -13,7 +13,7 @@ const DeckDetails = () => {
     const fetchDeck = async () => {
       if (!auth.currentUser) {
         console.log("No current user or deckId");
-        navigate('/'); 
+        navigate('/');
         return;
       }
 
@@ -34,6 +34,28 @@ const DeckDetails = () => {
     return <p>Loading...</p>;
   }
 
+  const deleteDeckAndCards = async () => {
+    if (window.confirm('Are you sure you want to delete this deck? This action cannot be undone.')) {
+      try {
+        // Delete all cards associated with the deck
+        const cardsRef = collection(db, 'cards');
+        const q = query(cardsRef, where('deck', '==', deckId)); // Assuming 'deck' field in 'cards' refers to the deck ID
+        const querySnapshot = await getDocs(q);
+
+        const deletePromises = querySnapshot.docs.map(doc => deleteDoc(doc.ref));
+        await Promise.all(deletePromises); // Delete all cards
+
+        // Delete the deck itself
+        await deleteDoc(doc(db, 'decks', deckId));
+
+        // Navigate back to homepage
+        navigate('/');
+      } catch (error) {
+        console.error("Error deleting deck and cards:", error);
+      }
+    }
+  };
+
   const goToHomepage = () => {
     navigate('/');
   };
@@ -43,10 +65,10 @@ const DeckDetails = () => {
       <h1>{deck.name}</h1>
       <p>Owner: {deck.createdBy}</p>
       <p>{deck.description}</p>
+      <button onClick={goToHomepage}>Go Back to Homepage</button>
+      <button onClick={deleteDeckAndCards}>Delete Deck</button>
       
       <Cards deckId={deckId} />
-      
-      <button onClick={goToHomepage}>Go Back to Homepage</button>
     </div>
   );
 };

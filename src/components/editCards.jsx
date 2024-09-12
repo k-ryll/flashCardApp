@@ -56,6 +56,7 @@ const EditCards = ({ deckId, refetchCards }) => {
         answer: answerInput,
         answerImage: answerImgUrl,
         deck: deckId,
+        confidenceLevel:1,
         createdBy: auth.currentUser.email,
         createdAt: serverTimestamp(),
       });
@@ -103,8 +104,8 @@ const EditCards = ({ deckId, refetchCards }) => {
 
   return (
     <div className='addcardContainer'>
-      <form onSubmit={submitDeck}>
-        <textarea
+      <form onSubmit={submitDeck} className='newDeckForm'>
+        <div><textarea
           className="questionInput"
           placeholder="Enter your question"
           value={questionInput}
@@ -116,8 +117,8 @@ const EditCards = ({ deckId, refetchCards }) => {
           onChange={(e) => fileChangedHandler(e, setQuestionImage)}
           className="questionImg"
           disabled={loading}
-        />
-        <textarea
+        /></div>
+        <div><textarea
           className="answerInput"
           placeholder="Enter your answer"
           value={answerInput}
@@ -129,7 +130,9 @@ const EditCards = ({ deckId, refetchCards }) => {
           onChange={(e) => fileChangedHandler(e, setAnswerImage)}
           className="answerImg"
           disabled={loading}
-        />
+        /></div>
+        
+        
         <button type="submit" disabled={loading}>
           {loading ? 'Uploading...' : 'Add Card'}
         </button>

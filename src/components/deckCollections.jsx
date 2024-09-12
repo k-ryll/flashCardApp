@@ -47,19 +47,17 @@ const DeckCollections = () => {
     <div className='deckContainer'>
       {decks.length > 0 ? (
         decks.map((deck) => (
-          <div className='deck'>
-            <img className="borderimage"src="box.svg" alt="" />
+          <div key={deck.id} className='deck'>
+            <img className="borderimage" src="box.svg" alt="" />
             <div 
-          key={deck.id} 
-          className="deckdetails"
-          onClick={() => handleDeckClick(deck.id)}
-          style={{ cursor: 'pointer' }}
-        >
-          
-          <h1>{deck.name}</h1>
-          <p>{deck.description}</p>
-        </div></div>
-          
+              className="deckdetails"
+              onClick={() => handleDeckClick(deck.id)}
+              style={{ cursor: 'pointer' }}
+            >
+              <h1>{deck.name}</h1>
+              <p>{deck.description}</p>
+            </div>
+          </div>
         ))
       ) : (
         <p>No decks found</p>
@@ -69,7 +67,7 @@ const DeckCollections = () => {
         <button className='newBtn' onClick={createNewDeck}>+</button>
       )}
 
-      {showCreateNewDeck && <NewDeck setShowCreateNewDeck={setShowCreateNewDeck} refetchDecks={fetchDecks}/> }
+      {showCreateNewDeck && <NewDeck setShowCreateNewDeck={setShowCreateNewDeck} refetchDecks={fetchDecks} />}
     </div>
   );
 };
