@@ -26,10 +26,9 @@ const StudyCard = ({ setShowStudyPage, cards }) => {
     return array.slice().sort((a, b) => {
       const aConfidence = confidenceLevels[a.id] || 0; // Default to 0 if no confidence level set
       const bConfidence = confidenceLevels[b.id] || 0;
-      return aConfidence - bConfidence;
+      return bConfidence - aConfidence; // Reverse the order
     });
   };
-
   useEffect(() => {
     // Shuffle the cards and then sort them by confidence level
     const shuffledCards = shuffleArray(cards);
