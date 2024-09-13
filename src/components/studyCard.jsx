@@ -1,19 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { writeBatch, doc } from 'firebase/firestore';
+import { writeBatch, doc, getDocs, collection, setDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
-const StudyCard = ({ setShowStudyPage, cards }) => {
+const StudyCard = ({ setShowStudyPage, cards, deckId }) => {
   const [showAnswer, setShowAnswer] = useState(false);
-  const [confidenceLevels, setConfidenceLevels] = useState({});
   const [questionNumber, setQuestionNumber] = useState(0);
-  const [batchCounter, setBatchCounter] = useState(0);
-  const [isLooping, setIsLooping] = useState(true); // Default to looping
+  const [isLooping, setIsLooping] = useState(true);
   const [sortedCards, setSortedCards] = useState([]);
-  const [loading, setLoading] = useState(false); // Add a loading state
+  const [loading, setLoading] = useState(false);
 
-  // Shuffle function
+  // Group cards by confidence level and sort
+  const groupByConfidence = (array) => {
+    const confidenceLevels = array.reduce((acc, card) => {
+      const level = card.confidenceLevel || 0;
+      if (!acc[level]) {
+        acc[level] = [];
+      }
+      acc[level].push(card);
+      return acc;
+    }, {});
+  
+    const levels = Object.keys(confidenceLevels).sort((a, b) => a - b);
+    const sortedCards = [];
+  
+    for (let i = 0; i < levels.length; i++) {
+      const level = levels[i];
+      const sortedLevelCards = confidenceLevels[level].sort((a, b) => {
+        // Add a sorting logic here, e.g., by card ID or creation date
+        return a.id - b.id;
+      });
+      while (sortedCards.length < array.length && sortedLevelCards.length > 0) {
+        sortedCards.push(sortedLevelCards.shift());
+      }
+    }
+  
+    return sortedCards;
+  };
+
+  useEffect(() => {
+    const shuffledCards = shuffleArray(cards);
+    setSortedCards(groupByConfidence(shuffledCards));
+  }, [cards]);
+
   const shuffleArray = (array) => {
-    let shuffledArray = array.slice(); // Copy the array
+    let shuffledArray = array.slice();
     for (let i = shuffledArray.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
@@ -21,87 +51,53 @@ const StudyCard = ({ setShowStudyPage, cards }) => {
     return shuffledArray;
   };
 
-  // Function to sort cards by confidence level
-  const sortByConfidence = (array) => {
-    return array.slice().sort((a, b) => {
-      const aConfidence = confidenceLevels[a.id] || 0; // Default to 0 if no confidence level set
-      const bConfidence = confidenceLevels[b.id] || 0;
-      return bConfidence - aConfidence; // Reverse the order
-    });
-  };
-  useEffect(() => {
-    // Shuffle the cards and then sort them by confidence level
-    const shuffledCards = shuffleArray(cards);
-    setSortedCards(sortByConfidence(shuffledCards));
-  }, [cards, confidenceLevels]); // Re-shuffle and sort if confidenceLevels change
-
-  // Function to handle confidence level selection
-  const handleConfidenceSelect = (level) => {
+  const handleConfidenceSelect = async (level) => {
     const currentCard = sortedCards[questionNumber];
-
-    // Update confidence levels for the current card
-    setConfidenceLevels((prev) => ({
-      ...prev,
-      [currentCard.id]: level,
-    }));
-
-    // Increase the batch counter and check if it's time to save to Firestore
-    setBatchCounter(batchCounter + 1);
-
-    if (batchCounter >= 9) {
-      saveBatchToFirestore(); // Save every 10 rounds
-      setBatchCounter(0);
+    if (!currentCard) {
+      console.error('No card available for selection');
+      return;
     }
 
-    // Move to the next question
+    const currentConfidenceLevel = currentCard.confidenceLevel || 0;
+
+    // Update confidence level only if it has changed
+    if (level !== currentConfidenceLevel) {
+      try {
+        // Update Firestore immediately
+        await setDoc(doc(db, 'cards', currentCard.id), { confidenceLevel: level }, { merge: true });
+        // Update local state
+        setSortedCards(prevCards => prevCards.map(card =>
+          card.id === currentCard.id ? { ...card, confidenceLevel: level } : card
+        ));
+      } catch (error) {
+        console.error('Error updating confidence level:', error);
+      }
+    }
+
     handleNextQuestion();
   };
 
-  // Function to batch save confidence levels to Firestore
-  const saveBatchToFirestore = async () => {
-    const batch = writeBatch(db);
-
-    Object.keys(confidenceLevels).forEach((cardId) => {
-      const cardRef = doc(db, 'cards', cardId);
-      batch.set(cardRef, { confidenceLevel: confidenceLevels[cardId] }, { merge: true });
-    });
-
-    await batch.commit();
-    console.log("levels set");
-    setConfidenceLevels({}); // Clear the stored levels after saving
-  };
-
-  // Function to move to the next question
   const handleNextQuestion = () => {
-    setLoading(true); // Start loading
+    setLoading(true);
 
     setTimeout(() => {
-      setShowAnswer(false); // Hide answer for the next card
+      setShowAnswer(false);
       if (questionNumber < sortedCards.length - 1) {
         setQuestionNumber(questionNumber + 1);
       } else if (isLooping) {
-        setQuestionNumber(0); // Loop back to the start
+        setQuestionNumber(0);
       } else {
         alert('You have completed all the questions!');
         setShowStudyPage(false);
       }
-      setLoading(false); // End loading
-    }, 500); // Adjust the delay for smooth transition
+      setLoading(false);
+    }, 500);
   };
 
-  // Function to toggle looping
   const toggleLooping = () => {
     setIsLooping(!isLooping);
   };
 
-  // Ensure any remaining data is saved when the component unmounts
-  useEffect(() => {
-    return () => {
-      if (batchCounter > 0) saveBatchToFirestore();
-    };
-  }, [batchCounter]);
-
-  // Get the current card based on question number
   const currentCard = sortedCards[questionNumber] || {};
 
   return (
@@ -112,7 +108,7 @@ const StudyCard = ({ setShowStudyPage, cards }) => {
       </button>
 
       {loading ? (
-        <div className="loading-center">Loading next question...</div> // Apply the loading-center class
+        <div className="loading-center">Loading next question...</div>
       ) : (
         <div className='study-panel'>
           {showAnswer ? (

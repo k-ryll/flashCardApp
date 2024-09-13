@@ -77,7 +77,7 @@ const Cards = ({ deckId }) => {
   return (
     <div className="cardContainer">
       {showStudyPage ? (
-        <StudyCard cards={cards} setShowStudyPage={setShowStudyPage} />
+        <StudyCard cards={cards} setShowStudyPage={setShowStudyPage} deckId={deckId} />
       ) : (
         <>
           <button className='startBtn' onClick={handleStartClick}>Start Studying</button>
