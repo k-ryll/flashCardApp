@@ -12,12 +12,13 @@
 
 /* Main container for decks */
 .deckContainer {
-  width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Responsive grid */
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Ensure the grid adapts */
   gap: 1rem;
   padding: 1rem;
+  overflow: hidden; /* Ensure no overflow from grid items */
 }
+
 
 /* Individual deck styling - Same dimensions as image */
 .deck {
