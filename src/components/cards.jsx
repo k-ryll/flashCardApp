@@ -20,7 +20,7 @@ const Cards = ({ deckId }) => {
     }
 
     try {
-      const deckRef = doc(db, 'decks', deckId); 
+      const deckRef = doc(db, 'decks', deckId);
       const deckDoc = await getDoc(deckRef);
 
       if (deckDoc.exists()) {
@@ -40,23 +40,15 @@ const Cards = ({ deckId }) => {
     if (!auth.currentUser || !deckId) return;
 
     const cardsRef = collection(db, 'cards');
-    const q = query(
-      cardsRef,
-      where('deck', '==', deckId)
-    );
+    const q = query(cardsRef, where('deck', '==', deckId));
 
     try {
       const querySnapshot = await getDocs(q);
-      const uniqueCards = querySnapshot.docs.map((doc) => ({
+      const fetchedCards = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
       }));
-
-      // Filter out duplicate cards by id
-      const filteredCards = uniqueCards.filter((card, index, self) =>
-        index === self.findIndex((t) => t.id === card.id)
-      );
-      setCards(filteredCards);
+      setCards(fetchedCards);
     } catch (error) {
       console.error('Error fetching the cards:', error);
     }
@@ -66,6 +58,17 @@ const Cards = ({ deckId }) => {
     fetchDeckOwner();
     fetchCards();
   }, [fetchDeckOwner, fetchCards]);
+
+  // Function to calculate the mastery level
+  const calculateMasteryLevel = () => {
+    if (cards.length === 0) return 0;
+
+    const totalConfidence = cards.reduce((sum, card) => sum + (card.confidenceLevel || 0), 0);
+    const maxConfidence = cards.length * 5; // Max confidence level is 5 for each card
+    return (totalConfidence / maxConfidence) * 100; // Return as percentage
+  };
+
+  const masteryLevel = calculateMasteryLevel();
 
   const handleStartClick = () => {
     setShowStudyPage(true);
@@ -79,25 +82,27 @@ const Cards = ({ deckId }) => {
         <>
           <button className='startBtn' onClick={handleStartClick}>Start Studying</button>
           {isOwner && <EditCards deckId={deckId} refetchCards={fetchCards} />}
-          <div className='cardPrviewContainer'>
-          {cards.length > 0 ? (
-            cards.map((card) => (
-              <div key={card.id} className='cardPreview'>
-                <div className='questionPreview'>
-                  <h2>{card.question}</h2>
-                 {card.questionImage && <img src={card.questionImage} alt="Question" />} 
-                </div>
-                <div className='answerPreview'>
-                  <h2>{card.answer}</h2>
-                  {card.answerImage && <img src={card.answerImage} alt="Answer" />}
-                </div>
-              </div>
-            ))
-          ) : (
-            <p>No cards in this deck</p>
-          )}
+          <div className='masteryLevel'>
+            <h2>Mastery Level: {masteryLevel.toFixed(2)}%</h2>
           </div>
-          
+          <div className='cardPrviewContainer'>
+            {cards.length > 0 ? (
+              cards.map((card) => (
+                <div key={card.id} className='cardPreview'>
+                  <div className='questionPreview'>
+                    <h2>{card.question}</h2>
+                    {card.questionImage && <img src={card.questionImage} alt="Question" />}
+                  </div>
+                  <div className='answerPreview'>
+                    <h2>{card.answer}</h2>
+                    {card.answerImage && <img src={card.answerImage} alt="Answer" />}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>No cards in this deck</p>
+            )}
+          </div>
         </>
       )}
     </div>
