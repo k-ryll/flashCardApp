@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
-import Cards from './Cards';
+import Cards from './cards';
 
 const DeckDetails = () => {
   const { deckId } = useParams();
