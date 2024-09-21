@@ -6,7 +6,7 @@
   width: 100%;
 }
 
-.deck-buttons, .deck-info{
+.deck-buttons, .deck-info {
   width: 100%;
   margin-top: 1rem;
   margin-left: 3rem;
@@ -17,22 +17,23 @@
   padding-inline: 3rem;
   gap: 1rem;
   margin-bottom: 0.5rem;
+  flex-wrap: wrap; /* Allow wrapping */
+  flex-direction: row;
 }
 
 .cardPreview div {
   border: 1px black solid;
-  width: 50%;
+  width:48%;
   padding: 1rem;
   background-color: white;
-  white-space: pre-wrap; /* Preserve newlines and spaces */
-  word-wrap: break-word; /* Ensure long words are wrapped */
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .cardContainer {
   display: flex;
-  flex-direction: column;
-  max-width: 90rem;
-
+  width: 100%; /* Ensure full width */
+  padding: 2rem;
 }
 
 .addcardContainer {
@@ -42,11 +43,7 @@
   gap: 1rem;
   padding-inline: 2rem;
   padding-block: 1rem;
-  flex-wrap: wrap; /* Allow items to wrap on smaller screens */
-}
-
-.newDeckForm div textarea {
-  font-size: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .newDeckForm {
@@ -55,7 +52,7 @@
   gap: 1rem;
   flex: 1;
   padding: 1rem;
-  flex-wrap: wrap; /* Allow the form to wrap on smaller screens */
+  flex-wrap: wrap;
 }
 
 .newDeckForm div {
@@ -76,7 +73,6 @@
 .startBtn:hover {
   background-color: pink;
   color: white;
-  cursor: pointer;
 }
 
 .study-panel {
@@ -97,9 +93,9 @@
   background-color: white;
   gap: 1rem;
   font-size: 1.5rem;
-  max-width: 50rem;
-  white-space: pre-wrap; /* Preserve newlines and spaces */
-  word-wrap: break-word; /* Ensure long words are wrapped */
+  max-width: 100%; /* Full width for mobile */
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .answer h1 {
@@ -110,11 +106,7 @@
 .question img,
 .answer img {
   max-width: 100%;
-  width: 30rem;
-}
-
-.question img {
-  display: inline-block;
+  height: auto; /* Ensure images scale properly */
 }
 
 .question button {
@@ -135,19 +127,20 @@
   align-items: center;
   font-size: 24px;
   font-weight: bold;
-  color: #333; /* Adjust color as needed */
+  color: #333;
   margin-top: 4rem;
 }
 
 /* Media Queries for responsiveness */
 @media (max-width: 768px) {
   .cardPreview div {
-    width: 100%; /* Make cards full-width on smaller screens */
+    width: 100%; /* Full-width on smaller screens */
+    padding-inline: 1rem; /* Adjust padding */
   }
 
   .addcardContainer,
   .newDeckForm {
-    flex-direction: column; /* Stack elements vertically on smaller screens */
+    flex-direction: column;
     padding-inline: 1rem;
   }
 
@@ -158,7 +151,7 @@
 
   .question img,
   .answer img {
-    width: 100%; /* Make images responsive on smaller screens */
+    width: 100%; /* Full-width images */
   }
 }
 
