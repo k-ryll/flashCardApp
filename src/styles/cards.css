@@ -11,27 +11,39 @@
   margin-top: 1rem;
   margin-left: 3rem;
 }
-
 .cardPreview {
   display: flex;
-  padding-inline: 3rem;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
   flex-wrap: wrap; /* Allow wrapping */
-  flex-direction: row;
+  gap: 2%; /* Add gap between the two columns */
+  max-width: 100rem;
+  width: 100%;
+  align-items: stretch; /* Stretch items to take equal height */
 }
 
-.cardPreview div {
-  border: 1px black solid;
-  width:48%;
+.card-panel {
+  width: 48%; /* Two-column layout */
+  box-sizing: border-box; /* Include padding and border in width */
+  margin-bottom: 1rem; /* Space between rows */
+  display: flex;
+  flex-direction: column;
+}
+
+.answerPreview, 
+.questionPreview {
+  border: 1px solid black;
   padding: 1rem;
   background-color: white;
   white-space: pre-wrap;
   word-wrap: break-word;
+  flex: 1; /* Make sure it fills available space */
+  width: 100%; /* Ensure full width inside parent */
+  box-sizing: border-box; /* Include padding and border in width */
 }
 
 .cardContainer {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%; /* Ensure full width */
   padding: 2rem;
 }
@@ -44,6 +56,8 @@
   padding-inline: 2rem;
   padding-block: 1rem;
   flex-wrap: wrap;
+  width: 100%;
+  max-width: 100rem;
 }
 
 .newDeckForm {
@@ -53,6 +67,7 @@
   flex: 1;
   padding: 1rem;
   flex-wrap: wrap;
+  
 }
 
 .newDeckForm div {
@@ -67,7 +82,6 @@
   background-color: white;
   padding: 1rem;
   border-radius: 10px;
-  align-self: center;
 }
 
 .startBtn:hover {

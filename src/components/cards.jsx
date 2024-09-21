@@ -78,14 +78,22 @@ const Cards = ({ deckId }) => {
             {cards.length > 0 ? (
               cards.map((card) => (
                 <div key={card.id} className='cardPreview'>
+                  <div className='card-panel'>
+                  <span>question</span>
                   <div className='questionPreview'>
                     <h2>{card.question}</h2>
                     {card.questionImage && <img src={card.questionImage} alt="Question" />}
                   </div>
+                  </div>
+                  <div className='card-panel'>
+                  <span>answer</span>
                   <div className='answerPreview'>
                     <h2>{card.answer}</h2>
                     {card.answerImage && <img src={card.answerImage} alt="Answer" />}
                   </div>
+                  </div>
+                  
+                  
                 </div>
               ))
             ) : (
