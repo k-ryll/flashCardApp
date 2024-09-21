@@ -14,18 +14,26 @@
 .cardPreview {
   display: flex;
   flex-wrap: wrap; /* Allow wrapping */
-  gap: 2%; /* Add gap between the two columns */
+  gap: 1rem; /* Add gap between the two columns */
   max-width: 100rem;
   width: 100%;
-  align-items: stretch; /* Stretch items to take equal height */
 }
 
 .card-panel {
-  width: 48%; /* Two-column layout */
+  width: 45%; /* Two-column layout */
   box-sizing: border-box; /* Include padding and border in width */
   margin-bottom: 1rem; /* Space between rows */
   display: flex;
   flex-direction: column;
+  
+}
+
+.edit{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
 }
 
 .answerPreview, 
@@ -147,10 +155,7 @@
 
 /* Media Queries for responsiveness */
 @media (max-width: 768px) {
-  .cardPreview div {
-    width: 100%; /* Full-width on smaller screens */
-    padding-inline: 1rem; /* Adjust padding */
-  }
+  
 
   .addcardContainer,
   .newDeckForm {
@@ -160,12 +165,29 @@
 
   .study-panel {
     padding: 1rem;
-    margin: 1rem;
   }
 
   .question img,
   .answer img {
     width: 100%; /* Full-width images */
+  }
+  .card-panel{
+    margin-bottom: 0;
+    
+    width: 100%;
+  }
+  .cardPreview{
+    justify-content: space-evenly;
+    gap: .5rem;
+  }
+  .edit{
+    justify-content: end;
+    width: 100%;
+    flex-direction: row;
+  }
+  .edit-icon{
+    max-width: 20px;
+    max-height: 20px;
   }
 }
 
