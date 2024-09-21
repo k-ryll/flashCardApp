@@ -59,20 +59,12 @@ const Cards = ({ deckId }) => {
     fetchCards();
   }, [fetchDeckOwner, fetchCards]);
 
-  // Function to calculate the mastery level
-  const calculateMasteryLevel = () => {
-    if (cards.length === 0) return 0;
-
-    const totalConfidence = cards.reduce((sum, card) => sum + (card.confidenceLevel || 0), 0);
-    const maxConfidence = cards.length * 5; // Max confidence level is 5 for each card
-    return (totalConfidence / maxConfidence) * 100; // Return as percentage
-  };
-
-  const masteryLevel = calculateMasteryLevel();
-
+  
   const handleStartClick = () => {
-    setShowStudyPage(true);
+    setShowStudyPage(true);  // This won't be reflected immediately in the logs
   };
+  
+
 
   return (
     <div className="cardContainer">
@@ -82,10 +74,7 @@ const Cards = ({ deckId }) => {
         <>
           <button className='startBtn' onClick={handleStartClick}>Start Studying</button>
           {isOwner && <EditCards deckId={deckId} refetchCards={fetchCards} />}
-          <div className='masteryLevel'>
-            <h2>Mastery Level: {masteryLevel.toFixed(2)}%</h2>
-          </div>
-          <div className='cardPrviewContainer'>
+          <div className='cardPreviewContainer'>
             {cards.length > 0 ? (
               cards.map((card) => (
                 <div key={card.id} className='cardPreview'>

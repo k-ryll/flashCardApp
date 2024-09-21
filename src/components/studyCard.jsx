@@ -1,77 +1,66 @@
 import React, { useState, useEffect } from 'react';
-import { writeBatch, doc, getDocs, collection, setDoc } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { db, auth } from '../config/firebase';
+import '../styles/studyCards.css';
 
-const StudyCard = ({ setShowStudyPage, cards, deckId }) => {
+const StudyCard = ({ setShowStudyPage, cards }) => {
   const [showAnswer, setShowAnswer] = useState(false);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [isLooping, setIsLooping] = useState(true);
   const [sortedCards, setSortedCards] = useState([]);
+  const [confidenceLevels, setConfidenceLevels] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Group cards by confidence level and sort
-  const groupByConfidence = (array) => {
-    const confidenceLevels = array.reduce((acc, card) => {
-      const level = card.confidenceLevel || 0;
-      if (!acc[level]) {
-        acc[level] = [];
-      }
-      acc[level].push(card);
-      return acc;
-    }, {});
-  
-    const levels = Object.keys(confidenceLevels).sort((a, b) => a - b);
-    const sortedCards = [];
-  
-    for (let i = 0; i < levels.length; i++) {
-      const level = levels[i];
-      const sortedLevelCards = confidenceLevels[level].sort((a, b) => {
-        // Add a sorting logic here, e.g., by card ID or creation date
-        return a.id - b.id;
-      });
-      while (sortedCards.length < array.length && sortedLevelCards.length > 0) {
-        sortedCards.push(sortedLevelCards.shift());
-      }
-    }
-  
-    return sortedCards;
-  };
+  useEffect(() => {
+    const fetchConfidenceLevels = async () => {
+      const levels = {};
+      await Promise.all(cards.map(async (card) => {
+        const docRef = doc(db, 'confidenceLevels', `${auth.currentUser.email}_${card.id}`);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          levels[card.id] = docSnap.data().confidenceLevel;
+        } else {
+          levels[card.id] = 0; // Default confidence if not found
+        }
+      }));
+      setConfidenceLevels(levels);
+    };
+
+    fetchConfidenceLevels();
+  }, [cards]);
 
   useEffect(() => {
     const shuffledCards = shuffleArray(cards);
-    setSortedCards(groupByConfidence(shuffledCards));
-  }, [cards]);
+    const filteredCards = filterCardsByConfidence(shuffledCards);
+    setSortedCards(filteredCards);
+  }, [cards, confidenceLevels]);
 
   const shuffleArray = (array) => {
-    let shuffledArray = array.slice();
-    for (let i = shuffledArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-    }
-    return shuffledArray;
+    return array.slice().sort(() => Math.random() - 0.5);
+  };
+
+  const filterCardsByConfidence = (array) => {
+    const lowestConfidence = Math.min(...array.map(card => confidenceLevels[card.id] || 0));
+    return array.filter(card => confidenceLevels[card.id] <= lowestConfidence);
   };
 
   const handleConfidenceSelect = async (level) => {
     const currentCard = sortedCards[questionNumber];
-    if (!currentCard) {
-      console.error('No card available for selection');
-      return;
-    }
+    if (!currentCard) return;
 
-    const currentConfidenceLevel = currentCard.confidenceLevel || 0;
+    try {
+      await setDoc(doc(db, 'confidenceLevels', `${auth.currentUser.email}_${currentCard.id}`), {
+        confidenceLevel: level,
+        userId: auth.currentUser.email,
+        cardId: currentCard.id
+      }, { merge: true });
 
-    // Update confidence level only if it has changed
-    if (level !== currentConfidenceLevel) {
-      try {
-        // Update Firestore immediately
-        await setDoc(doc(db, 'cards', currentCard.id), { confidenceLevel: level }, { merge: true });
-        // Update local state
-        setSortedCards(prevCards => prevCards.map(card =>
-          card.id === currentCard.id ? { ...card, confidenceLevel: level } : card
-        ));
-      } catch (error) {
-        console.error('Error updating confidence level:', error);
-      }
+      setConfidenceLevels(prev => ({
+        ...prev,
+        [currentCard.id]: level
+      }));
+    } catch (error) {
+      console.error('Error updating confidence level:', error);
     }
 
     handleNextQuestion();
@@ -79,11 +68,10 @@ const StudyCard = ({ setShowStudyPage, cards, deckId }) => {
 
   const handleNextQuestion = () => {
     setLoading(true);
-
     setTimeout(() => {
       setShowAnswer(false);
       if (questionNumber < sortedCards.length - 1) {
-        setQuestionNumber(questionNumber + 1);
+        setQuestionNumber(prev => prev + 1);
       } else if (isLooping) {
         setQuestionNumber(0);
       } else {
@@ -95,36 +83,36 @@ const StudyCard = ({ setShowStudyPage, cards, deckId }) => {
   };
 
   const toggleLooping = () => {
-    setIsLooping(!isLooping);
+    setIsLooping(prev => !prev);
   };
 
   const currentCard = sortedCards[questionNumber] || {};
 
   return (
-    <div>
-      <button onClick={() => setShowStudyPage(false)}>Close</button>
-      <button onClick={toggleLooping}>
+    <div className="study-card-container">
+      <button className="close-button" onClick={() => setShowStudyPage(false)}>Close</button>
+      <button className="looping-button" onClick={toggleLooping}>
         {isLooping ? 'Disable Looping' : 'Enable Looping'}
       </button>
 
       {loading ? (
         <div className="loading-center">Loading next question...</div>
       ) : (
-        <div className='study-panel'>
+        <div className="study-panel">
           {showAnswer ? (
-            <div className='answer'>
+            <div className="answer">
               <h1>{currentCard.answer || 'No answer available'}</h1>
               {currentCard.answerImage && <img src={currentCard.answerImage} alt="Answer" />}
-              <div>
-                <button onClick={() => handleConfidenceSelect(1)}>1 (Low)</button>
-                <button onClick={() => handleConfidenceSelect(2)}>2</button>
-                <button onClick={() => handleConfidenceSelect(3)}>3</button>
-                <button onClick={() => handleConfidenceSelect(4)}>4</button>
-                <button onClick={() => handleConfidenceSelect(5)}>5 (High)</button>
+              <div className="confidence-buttons">
+                {[1, 2, 3, 4, 5].map(level => (
+                  <button key={level} onClick={() => handleConfidenceSelect(level)}>
+                    {level} {level === 1 ? '(Low)' : level === 5 ? '(High)' : ''}
+                  </button>
+                ))}
               </div>
             </div>
           ) : (
-            <div className='question'>
+            <div className="question">
               <h1>{currentCard.question || 'No question available'}</h1>
               {currentCard.questionImage && <img src={currentCard.questionImage} alt="Question" />}
               <button onClick={() => setShowAnswer(true)}>Reveal Answer</button>

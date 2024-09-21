@@ -21,14 +21,14 @@ const EditCards = ({ deckId, refetchCards }) => {
     return getDownloadURL(imageRef);
   };
 
-  const submitDeck = async (e) => {
+  const submitCard = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     if (!deckId) {
-        setErrorMessage('Invalid deck. Please try again.');
-        setLoading(false);
-        return;
+      setErrorMessage('Invalid deck. Please try again.');
+      setLoading(false);
+      return;
     }
 
     if (!questionInput || !answerInput) {
@@ -56,7 +56,6 @@ const EditCards = ({ deckId, refetchCards }) => {
         answer: answerInput,
         answerImage: answerImgUrl,
         deck: deckId,
-        confidenceLevel:0,
         createdBy: auth.currentUser.email,
         createdAt: serverTimestamp(),
       });
@@ -82,17 +81,15 @@ const EditCards = ({ deckId, refetchCards }) => {
   };
 
   const fileChangedHandler = (event, setImage) => {
-    let file = event.target.files[0];
-
-    // Check if the file is an image
+    const file = event.target.files[0];
     const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+
     if (!validImageTypes.includes(file.type)) {
       window.alert('File does not support. You must use .png, .jpg, or .gif.');
       event.target.value = null;
       return false;
     }
 
-    // Check if the file size is greater than 10 MB
     if (file.size > 10e6) {
       window.alert('Please upload a file smaller than 10 MB.');
       event.target.value = null;
@@ -104,35 +101,37 @@ const EditCards = ({ deckId, refetchCards }) => {
 
   return (
     <div className='addcardContainer'>
-      <form onSubmit={submitDeck} className='newDeckForm'>
-        <div><textarea
-          className="questionInput"
-          placeholder="Enter your question"
-          value={questionInput}
-          onChange={(e) => setQuestionInput(e.target.value)}
-          disabled={loading}
-        />
-        <input
-          type="file"
-          onChange={(e) => fileChangedHandler(e, setQuestionImage)}
-          className="questionImg"
-          disabled={loading}
-        /></div>
-        <div><textarea
-          className="answerInput"
-          placeholder="Enter your answer"
-          value={answerInput}
-          onChange={(e) => setAnswerInput(e.target.value)}
-          disabled={loading}
-        />
-        <input
-          type="file"
-          onChange={(e) => fileChangedHandler(e, setAnswerImage)}
-          className="answerImg"
-          disabled={loading}
-        /></div>
-        
-        
+      <form onSubmit={submitCard} className='newDeckForm'>
+        <div>
+          <textarea
+            className="questionInput"
+            placeholder="Enter your question"
+            value={questionInput}
+            onChange={(e) => setQuestionInput(e.target.value)}
+            disabled={loading}
+          />
+          <input
+            type="file"
+            onChange={(e) => fileChangedHandler(e, setQuestionImage)}
+            className="questionImg"
+            disabled={loading}
+          />
+        </div>
+        <div>
+          <textarea
+            className="answerInput"
+            placeholder="Enter your answer"
+            value={answerInput}
+            onChange={(e) => setAnswerInput(e.target.value)}
+            disabled={loading}
+          />
+          <input
+            type="file"
+            onChange={(e) => fileChangedHandler(e, setAnswerImage)}
+            className="answerImg"
+            disabled={loading}
+          />
+        </div>
         <button type="submit" disabled={loading}>
           {loading ? 'Uploading...' : 'Add Card'}
         </button>
