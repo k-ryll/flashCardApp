@@ -51,7 +51,8 @@ body {
   overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
-textarea{resize: none;}
+textarea{
+	resize: none;}
 
 :root {
   --clr-background:#F4E7FB;

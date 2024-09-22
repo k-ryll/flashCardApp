@@ -57,12 +57,6 @@
 }
 
 .addcardContainer {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1rem;
-  padding-inline: 2rem;
-  padding-block: 1rem;
   flex-wrap: wrap;
   width: 100%;
   max-width: 100rem;
@@ -83,6 +77,11 @@
   flex-direction: column;
   gap: 0.5rem;
   flex: 1;
+}
+
+.newDeckForm div textarea{
+  font-size: 1.5rem;
+  height: 6rem;
 }
 
 .startBtn {
