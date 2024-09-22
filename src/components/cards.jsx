@@ -5,6 +5,7 @@ import StudyCard from './studyCard';
 import { useNavigate } from 'react-router-dom';
 import '../styles/cards.css';
 import { FaEdit } from 'react-icons/fa';
+import EditCards from './editCards';
 
 const Cards = ({ deckId }) => {
   const [cards, setCards] = useState([]);
@@ -93,6 +94,7 @@ const Cards = ({ deckId }) => {
       ) : (
         <>
           <button className='startBtn' onClick={handleStartClick}>Start Studying</button>
+          <EditCards deckId={deckId} refetchCards={fetchCards}/>
           <div className='cardPreviewContainer'>
             {cards.length > 0 ? (
               cards.map((card) => (
