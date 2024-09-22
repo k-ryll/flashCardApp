@@ -42,15 +42,16 @@ const Cards = ({ deckId }) => {
 
   const fetchCards = useCallback(async () => {
     if (!auth.currentUser || !deckId) return;
-
+  
     const cardsRef = collection(db, 'cards');
-    const q = query(cardsRef, where('deck', '==', deckId));
-
+    const q = query(cardsRef, where('deck', '==', deckId), orderBy('createdAt', 'asc')); // Sorting by createdAt
+  
     try {
       const querySnapshot = await getDocs(q);
       const fetchedCards = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
+        createdAt: doc.data().createdAt ? doc.data().createdAt.toDate() : null, // Convert to JS Date
       }));
       setCards(fetchedCards);
     } catch (error) {
