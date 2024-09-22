@@ -15,8 +15,15 @@ const StudyCard = ({ setShowStudyPage, cards }) => {
     const fetchConfidenceLevels = async () => {
       const levels = {};
       await Promise.all(cards.map(async (card) => {
-        const docRef = doc(db, 'confidenceLevels', `${auth.currentUser.email}_${card.id}`);
-        const docSnap = await getDoc(docRef);
+        const docRef1 = doc(db, 'confidenceLevels', `${auth.currentUser.email}_${card.id}`);
+        const docRef2 = doc(db, 'confidenceLevels', `${card.id}_${auth.currentUser.email}`);
+        
+        let docSnap = await getDoc(docRef1);
+
+        if (!docSnap.exists()) {
+          docSnap = await getDoc(docRef2);
+        }
+
         if (docSnap.exists()) {
           levels[card.id] = docSnap.data().confidenceLevel;
         } else {
@@ -48,8 +55,10 @@ const StudyCard = ({ setShowStudyPage, cards }) => {
     const currentCard = sortedCards[questionNumber];
     if (!currentCard) return;
 
+    const docId = `${auth.currentUser.email}_${currentCard.id}`;
+
     try {
-      await setDoc(doc(db, 'confidenceLevels', `${auth.currentUser.email}_${currentCard.id}`), {
+      await setDoc(doc(db, 'confidenceLevels', docId), {
         confidenceLevel: level,
         userId: auth.currentUser.email,
         cardId: currentCard.id
