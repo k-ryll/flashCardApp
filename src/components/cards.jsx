@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { db, auth } from '../config/firebase';
-import { doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, orderBy, updateDoc } from 'firebase/firestore';
 import StudyCard from './studyCard';
 import { useNavigate } from 'react-router-dom';
 import '../styles/cards.css';
@@ -44,16 +44,15 @@ const Cards = ({ deckId }) => {
     if (!auth.currentUser || !deckId) return;
   
     const cardsRef = collection(db, 'cards');
-    const q = query(cardsRef, where('deck', '==', deckId), orderBy('createdAt', 'asc')); // Sorting by createdAt
+    const q = query(cardsRef, where('deck', '==', deckId), orderBy('createdAt', 'asc')); // Order by createdAt directly
   
     try {
       const querySnapshot = await getDocs(q);
       const fetchedCards = querySnapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
-        createdAt: doc.data().createdAt ? doc.data().createdAt.toDate() : null, // Convert to JS Date
       }));
-      setCards(fetchedCards);
+      setCards(fetchedCards); // Set the cards without JS Date conversion
     } catch (error) {
       console.error('Error fetching the cards:', error);
     }

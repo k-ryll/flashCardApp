@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { collection, query, getDocs, where } from 'firebase/firestore';
+import { collection, query, getDocs, where, orderBy } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { db, auth } from '../config/firebase';
 import NewDeck from './newDeck';
@@ -9,22 +9,31 @@ const DeckCollections = () => {
   const [decks, setDecks] = useState([]);
   const navigate = useNavigate();
 
-  const fetchDecks = async () => {
-    if (!auth.currentUser) {
-      navigate('/'); 
-      return;
-    }
+  
+const fetchDecks = async () => {
+  if (!auth.currentUser) {
+    navigate('/'); 
+    return;
+  }
 
-    const decksRef = collection(db, 'decks');
-    const q = query(decksRef, where('createdBy', '==', auth.currentUser.email));
+  const decksRef = collection(db, 'decks');
+  const q = query(
+    decksRef,
+    where('createdBy', '==', auth.currentUser.email),
+    orderBy('createdAt', 'asc') // Order by createdAt in ascending order
+  );
 
+  try {
     const querySnapshot = await getDocs(q);
     const decksArray = querySnapshot.docs.map(doc => ({
       ...doc.data(),
       id: doc.id
     }));
-    setDecks(decksArray);
-  };
+    setDecks(decksArray); // Set the decks ordered by createdAt (oldest to newest)
+  } catch (error) {
+    console.error('Error fetching the decks:', error);
+  }
+};
 
   useEffect(() => {
     fetchDecks();
