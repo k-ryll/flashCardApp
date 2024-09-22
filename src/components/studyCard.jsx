@@ -3,7 +3,7 @@ import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../config/firebase';
 import '../styles/studyCards.css';
 
-const StudyCard = ({ setShowStudyPage, cards }) => {
+const StudyCard = ({ setShowStudyPage, cards, deckId }) => {
   const [showAnswer, setShowAnswer] = useState(false);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [isLooping, setIsLooping] = useState(true);
@@ -61,7 +61,8 @@ const StudyCard = ({ setShowStudyPage, cards }) => {
       await setDoc(doc(db, 'confidenceLevels', docId), {
         confidenceLevel: level,
         userId: auth.currentUser.email,
-        cardId: currentCard.id
+        cardId: currentCard.id,
+        deckId: deckId
       }, { merge: true });
 
       setConfidenceLevels(prev => ({

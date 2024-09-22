@@ -33,28 +33,51 @@ const DeckDetails = () => {
   }, [deckId, navigate]);
 
   const calculateMasteryLevel = async (deckId) => {
-    const confidenceLevelsRef = collection(db, 'confidenceLevels');
-    const cardIds = await fetchCardIds(deckId);
-    const q = query(confidenceLevelsRef, where('userId', '==', auth.currentUser.email));
-    const querySnapshot = await getDocs(q);
+    try {
+      // Fetch card IDs belonging to the deck
+      const cardIds = await fetchCardIds(deckId);
   
-    let totalConfidence = 0;
-    let count = 0;
-  
-    querySnapshot.forEach(doc => {
-      const [cardId] = doc.id.split('_'); // Extract cardId from the document ID
-      if (cardIds.includes(cardId)) { // Check if the cardId belongs to the current deck
-        totalConfidence += doc.data().confidenceLevel || 0;
-        count++;
+      if (!cardIds || cardIds.length === 0) {
+        console.warn('No cards found for this deck.');
+        setMasteryLevel(0);
+        return;
       }
-    });
   
-    if (count > 0) {
-      setMasteryLevel((totalConfidence / (count * 5)) * 100);
-    } else {
-      setMasteryLevel(0);
+      // Query the confidence levels for the current user
+      const confidenceLevelsRef = collection(db, 'confidenceLevels');
+      const q = query(confidenceLevelsRef, where('userId', '==', auth.currentUser.email));
+      const querySnapshot = await getDocs(q);
+  
+      let totalConfidence = 0;
+      let count = 0;
+  
+      querySnapshot.forEach(doc => {
+        const docId = doc.id;
+        const confidenceData = doc.data();
+        
+        // Extract the cardId from the docId (format: userId_cardId)
+        const cardId = docId.split('_')[1];
+  
+        // Check if the cardId belongs to the current deck
+        if (cardIds.includes(cardId)) {
+          totalConfidence += confidenceData.confidenceLevel || 0;
+          count++;
+        }
+      });
+  
+      if (count > 0) {
+        // Calculate mastery level as a percentage
+        const masteryLevel = (totalConfidence / (count * 5)) * 100;
+        setMasteryLevel(masteryLevel);
+      } else {
+        setMasteryLevel(0);
+      }
+    } catch (error) {
+      console.error('Error calculating mastery level:', error);
+      setMasteryLevel(0); // Set mastery level to 0 on error
     }
   };
+  
   
   
 
